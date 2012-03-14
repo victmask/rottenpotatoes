@@ -8,10 +8,14 @@ class MoviesController < ApplicationController
 
   def index
     @all_ratings = Movie.get_ratings
-    @field = params[:field] || ''
-    ratings = params[:ratings].respond_to?('keys') ? params[:ratings].keys : params[:ratings]
-    @ratings = params[:ratings] ? ratings : @all_ratings
+    session[:field] = params[:field] if params[:field]
+    session[:ratings] = params[:ratings] if params[:ratings]
+    @field = session[:field] || ''
+    ratings = session[:ratings].respond_to?('keys') ? session[:ratings].keys : session[:ratings]
+    @ratings = session[:ratings] ? ratings : @all_ratings
+
     @movies = Movie.where(:rating => @ratings).order(@field)
+    redirect_to movies_path(:ratings => @ratings, :field => @field) unless (params[:field] || params[:ratings])
   end
 
   def new
